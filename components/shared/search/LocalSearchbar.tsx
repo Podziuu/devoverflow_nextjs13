@@ -20,11 +20,9 @@ const LocalSearchbar = ({
   otherClasses,
 }: CustomInputProps) => {
   return (
-    <div
-      className={`background-light800_darkgradient flex min-h-[56px] grow items-center gap-4 rounded-[10px] p-4 ${otherClasses}`}
-    >
-      {iconPosition === "left" && (
-        <Image
+    <div className={`background-light800_darkgradient flex min-h-[56px] grow items-center gap-4 rounded-[10px] px-4 ${otherClasses}`}>
+      {iconPosition === 'left' && (
+        <Image 
           src={imgSrc}
           alt="search icon"
           width={24}
@@ -32,16 +30,17 @@ const LocalSearchbar = ({
           className="cursor-pointer"
         />
       )}
+
       <Input
         type="text"
         placeholder={placeholder}
         value=""
         onChange={() => {}}
-        className="
-        placeholder no-focus paragraph-regular border-none bg-transparent shadow-none outline-none"
+        className="paragraph-regular no-focus placeholder text-dark400_light700 border-none bg-transparent shadow-none outline-none"
       />
-      {iconPosition === "right" && (
-        <Image
+
+      {iconPosition === 'right' && (
+        <Image 
           src={imgSrc}
           alt="search icon"
           width={24}
