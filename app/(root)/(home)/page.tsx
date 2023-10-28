@@ -4,6 +4,45 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { HomePageFilters } from "@/constants/filters";
 import HomeFilters from "@/components/home/HomeFilters";
+import NoResult from "@/components/shared/NoResult";
+import QuestionCard from "@/components/cards/QuestionCard";
+
+const questions = [
+  {
+    _id: "1",
+    title: "Cascading Deletes in SQLAlchemy?",
+    tags: [
+      { _id: "1", name: "Python" },
+      { _id: "2", name: "SQL" },
+    ],
+    author: {
+      _id: "1",
+      name: "Bartosz",
+      picture: "url_to_picture.png",
+    },
+    upvotes: 1500000,
+    views: 500002,
+    answers: [],
+    createdAt: new Date("2021-09-01T12:00:00.000Z"),
+  },
+  {
+    _id: "2",
+    title: "How to center a div in CSS?",
+    tags: [
+      { _id: "3", name: "CSS" },
+      { _id: "4", name: "HTML" },
+    ],
+    author: {
+      _id: "2",
+      name: "Alice",
+      picture: "url_to_another_picture.png",
+    },
+    upvotes: 150000,
+    views: 50000,
+    answers: [],
+    createdAt: new Date("2023-01-15T08:30:00.000Z"),
+  },
+];
 
 export default function Home() {
   return (
@@ -34,6 +73,31 @@ export default function Home() {
       </div>
 
       <HomeFilters />
+
+      <div className="mt-10 flex w-full flex-col gap-6">
+        {questions.length > 0 ? (
+          questions.map((question) => (
+            <QuestionCard
+              key={question._id}
+              _id={question._id}
+              title={question.title}
+              tags={question.tags}
+              author={question.author}
+              upvotes={question.upvotes}
+              views={question.views}
+              answers={question.answers}
+              createdAt={question.createdAt}
+            />
+          ))
+        ) : (
+          <NoResult
+            title="There's no question to show"
+            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
+            link="/ask-question"
+            linkTitle="Ask a Question"
+          />
+        )}
+      </div>
     </>
   );
 }
