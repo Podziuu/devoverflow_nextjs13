@@ -3,6 +3,8 @@ import React from "react";
 import RenderTag from "../shared/RenderTag";
 import Metric from "../shared/Metric";
 import { formatNumberWithExtension, getTimeStamp } from "@/lib/utils";
+import { SignedIn } from "@clerk/nextjs";
+import EditDelete from "../shared/EditDelete";
 
 interface QuestionProps {
   _id: string;
@@ -15,12 +17,13 @@ interface QuestionProps {
     _id: string;
     name: string;
     picture: string;
+    clerkId: string;
   };
   upvotes: string[];
   views: number;
   answers: Array<object>;
   createdAt: Date;
-  clerkId?: string;
+  clerkId?: string | null;
 }
 
 const QuestionCard = ({
@@ -32,11 +35,14 @@ const QuestionCard = ({
   views,
   answers,
   createdAt,
+  clerkId,
 }: QuestionProps) => {
+  const showActionButtons = clerkId && clerkId === author.clerkId;
+
   return (
     <div className="card-wrapper rounded-[10px] p-9 sm:px-11">
       <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
-        <div>
+        <div className="flex w-full justify-between">
           <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
             {getTimeStamp(createdAt)}
           </span>
@@ -46,6 +52,11 @@ const QuestionCard = ({
             </h3>
           </Link>
           {/* If signed in add edit delete actions */}
+          <SignedIn>
+            {showActionButtons && (
+              <EditDelete type="question" itemId={JSON.stringify(_id)} />
+            )}
+          </SignedIn>
         </div>
       </div>
 
