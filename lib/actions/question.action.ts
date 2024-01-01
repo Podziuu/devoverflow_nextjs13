@@ -197,10 +197,11 @@ export async function editQuestion(params: EditQuestionParams) {
 
     const { questionId, title, content, path } = params;
 
-    const question = await Question.findByIdAndUpdate(questionId).populate("tags")
+    const question =
+      await Question.findByIdAndUpdate(questionId).populate("tags");
 
-    if(!question) {
-      throw new Error("Question not found")
+    if (!question) {
+      throw new Error("Question not found");
     }
 
     question.title = title;
@@ -209,6 +210,21 @@ export async function editQuestion(params: EditQuestionParams) {
     await question.save();
 
     revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function getHotQuestions() {
+  try {
+    connectToDatabase();
+
+    const questions = await Question.find({})
+      .sort({ views: -1, upvotes: -1 })
+      .limit(5);
+
+      return questions;
   } catch (error) {
     console.log(error);
     throw error;
