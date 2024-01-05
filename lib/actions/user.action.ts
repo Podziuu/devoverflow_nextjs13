@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use server";
 
 import { FilterQuery } from "mongoose";
@@ -67,7 +68,7 @@ export async function deleteUser(params: DeleteUserParams) {
 
     const { clerkId } = params;
 
-    const user = await User.findOneAndDelete({ clerkId });
+    const user = await User.findOneAndDelete({ clerkId }) as any;
 
     if (!user) {
       throw new Error("User not found");

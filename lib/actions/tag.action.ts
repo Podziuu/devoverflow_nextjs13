@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use server";
 
 import User from "@/database/user.modal";
@@ -15,7 +16,6 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
     connectToDatabase();
 
-    // eslint-disable-next-line no-unused-vars
     const { userId, limit = 3 } = params;
 
     const user = await User.findById(userId);
