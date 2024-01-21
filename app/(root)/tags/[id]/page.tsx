@@ -15,7 +15,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">{result.tagTitle}</h1>
-      <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
+      <div className="mt-11 w-full">
         <LocalSearchbar
           route={`/tags/${params.id}`}
           iconPosition="left"
@@ -24,7 +24,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
           otherClasses="flex-1"
         />
       </div>
-      <section className="mt-12 flex flex-wrap gap-4">
+      <section className="mt-10 flex w-full flex-col gap-6">
         {result.questions.length > 0 ? (
           result.questions.map((question: any) => (
             <QuestionCard

@@ -1,18 +1,22 @@
 import NoResult from "@/components/shared/NoResult";
 import QuestionCard from "@/components/cards/QuestionCard";
-import { getSavedQuestions} from "@/lib/actions/user.action";
+import { getSavedQuestions } from "@/lib/actions/user.action";
 import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { QuestionFilters } from "@/constants/filters";
 import Filter from "@/components/shared/Filter";
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
+import { SearchParamsProps } from "@/types";
 
-export default async function Home() {
+export default async function Home({ searchParams }: SearchParamsProps) {
   const { userId } = auth();
 
   if (!userId) redirect("/sign-in");
 
-  const result = await getSavedQuestions({ clerkId: userId });
+  const result = await getSavedQuestions({
+    clerkId: userId,
+    searchQuery: searchParams.q,
+  });
 
   return (
     <>
@@ -20,7 +24,7 @@ export default async function Home() {
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <LocalSearchbar
-          route="/"
+          route="/collection"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
           placeholder="Search for questions"
@@ -31,7 +35,6 @@ export default async function Home() {
           otherClasses="min-h-[56px] sm:min-w-[170px]"
         />
       </div>
-
 
       <div className="mt-10 flex w-full flex-col gap-6">
         {result.questions.length > 0 ? (

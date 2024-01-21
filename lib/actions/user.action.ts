@@ -68,7 +68,7 @@ export async function deleteUser(params: DeleteUserParams) {
 
     const { clerkId } = params;
 
-    const user = await User.findOneAndDelete({ clerkId }) as any;
+    const user = (await User.findOneAndDelete({ clerkId })) as any;
 
     if (!user) {
       throw new Error("User not found");
@@ -101,7 +101,16 @@ export async function getAllUsers(params: GetAllUsersParams) {
     // eslint-disable-next-line no-unused-vars
     const { page = 1, pageSize = 20, filter, searchQuery } = params;
 
-    const users = await User.find({}).sort({ createdAt: -1 });
+    const query: FilterQuery<typeof User> = {};
+
+    if (searchQuery) {
+      query.$or = [
+        { username: { $regex: new RegExp(searchQuery, "i") } },
+        { name: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
+
+    const users = await User.find(query).sort({ createdAt: -1 });
 
     return { users };
   } catch (error) {
