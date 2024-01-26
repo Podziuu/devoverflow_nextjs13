@@ -15,9 +15,10 @@ interface Props {
   params: {
     questionId: string;
   };
+  searchParams: { [key: string]: string | undefined };
 }
 
-const Page = async ({ params }: Props) => {
+const Page = async ({ params, searchParams }: Props) => {
   const result = await getQuestionById({ questionId: params.questionId });
 
   const { userId: clerkId } = auth();
@@ -106,6 +107,8 @@ const Page = async ({ params }: Props) => {
         questionId={result._id}
         userId={mongoUser?._id}
         totalAnswers={result.answers.length}
+        filter={searchParams?.filter}
+        // page={searchParams?.page}
       />
 
       <Answer
