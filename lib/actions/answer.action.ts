@@ -44,7 +44,7 @@ export async function getAnswers(params: GetAnswersParams) {
   try {
     connectToDatabase();
 
-    const { questionId, sortBy } = params;
+    const { questionId, sortBy, page = 1, pageSize = 10 } = params;
 
     let sortOptions = {};
 
@@ -70,9 +70,15 @@ export async function getAnswers(params: GetAnswersParams) {
         path: "author",
         model: "User",
       })
-      .sort(sortOptions);
+      .sort(sortOptions)
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
 
-    return { answers };
+    const totalAnswers = await Answer.countDocuments({ question: questionId });
+
+    const isNext = totalAnswers > (page - 1) * pageSize + answers.length;
+
+    return { answers, isNext };
   } catch (error) {
     console.log(error);
     throw error;

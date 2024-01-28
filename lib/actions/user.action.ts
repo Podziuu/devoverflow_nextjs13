@@ -98,7 +98,6 @@ export async function getAllUsers(params: GetAllUsersParams) {
   try {
     connectToDatabase();
 
-    // eslint-disable-next-line no-unused-vars
     const { page = 1, pageSize = 20, filter, searchQuery } = params;
 
     const query: FilterQuery<typeof User> = {};
@@ -126,9 +125,16 @@ export async function getAllUsers(params: GetAllUsersParams) {
         break;
     }
 
-    const users = await User.find(query).sort(sortOptions);
+    const totalUsers = await User.countDocuments();
 
-    return { users };
+    const users = await User.find(query)
+      .sort(sortOptions)
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    const isNext = totalUsers > (page - 1) * pageSize + users.length;
+
+    return { users, isNext };
   } catch (error) {
     console.log(error);
     throw error;
@@ -174,7 +180,7 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
   try {
     connectToDatabase();
 
-    const { clerkId, page = 1, pageSize = 10, filter, searchQuery } = params;
+    const { clerkId, page = 1, pageSize = 1, filter, searchQuery } = params;
 
     const query: FilterQuery<typeof Question> = searchQuery
       ? { title: { $regex: new RegExp(searchQuery, "i") } }
@@ -183,19 +189,19 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
     let sortOptions = {};
 
     switch (filter) {
-      case 'most_recent':
+      case "most_recent":
         sortOptions = { createdAt: -1 };
         break;
-      case 'oldest':
+      case "oldest":
         sortOptions = { createdAt: 1 };
         break;
-      case 'most_upvoted':
+      case "most_upvoted":
         sortOptions = { upvotes: -1 };
         break;
-      case 'most_viewed':
+      case "most_viewed":
         sortOptions = { views: -1 };
         break;
-      case 'most_answered':
+      case "most_answered":
         sortOptions = { answers: -1 };
         break;
       default:
@@ -207,6 +213,8 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
       match: query,
       options: {
         sort: sortOptions,
+        skip: (page - 1) * pageSize,
+        limit: pageSize + 1,
       },
       model: Question,
       populate: [
@@ -227,7 +235,8 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
       throw new Error("User not found");
     }
 
-    return { questions: user.saved };
+    const isNext = user.saved.length > pageSize;
+    return { questions: user.saved, isNext };
   } catch (error) {
     console.log(error);
     throw error;
@@ -275,7 +284,9 @@ export async function getUserQuestions(params: GetUserStatsParams) {
       .skip((page - 1) * pageSize)
       .limit(pageSize);
 
-    return { totalQuestions, questions };
+    const isNext = totalQuestions > (page - 1) * pageSize + questions.length;
+
+    return { totalQuestions, questions, isNextQuestions: isNext};
   } catch (error) {
     console.log(error);
     throw error;
@@ -297,7 +308,9 @@ export async function getUserAnswers(params: GetUserStatsParams) {
       .skip((page - 1) * pageSize)
       .limit(pageSize);
 
-    return { totalAnswers, answers };
+    const isNext = totalAnswers > (page - 1) * pageSize + answers.length;
+
+    return { totalAnswers, answers, isNextAnswers: isNext};
   } catch (error) {
     console.log(error);
     throw error;

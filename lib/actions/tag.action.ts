@@ -39,7 +39,7 @@ export async function getAllTags(params: GetAllTagsParams) {
   try {
     connectToDatabase();
 
-    const { searchQuery, filter } = params;
+    const { searchQuery, filter, page = 1, pageSize = 20 } = params;
 
     const query: FilterQuery<typeof Tag> = {};
 
@@ -64,9 +64,16 @@ export async function getAllTags(params: GetAllTagsParams) {
         break;
     }
 
-    const tags = await Tag.find(query).sort(sortOptions);
+    const totalTags = await Tag.countDocuments();
 
-    return { tags };
+    const tags = await Tag.find(query)
+      .sort(sortOptions)
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    const isNext = totalTags > (page - 1) * pageSize + tags.length;
+
+    return { tags, isNext };
   } catch (error) {
     console.log(error);
     throw error;
@@ -89,6 +96,8 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
         : {},
       options: {
         sort: { createdAt: -1 },
+        skip: (page - 1) * pageSize,
+        limit: pageSize + 1,
       },
       populate: [
         {
@@ -108,7 +117,9 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
       throw new Error("Tag not found");
     }
 
-    return { tagTitle: tag.name, questions: tag.questions };
+    const isNext = tag.questions.length > pageSize;
+
+    return { tagTitle: tag.name, questions: tag.questions, isNext };
   } catch (error) {
     console.log(error);
     throw error;
