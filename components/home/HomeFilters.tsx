@@ -25,7 +25,6 @@ const HomeFilters = () => {
       })
       router.push(newUrl, {scroll: false});
     }
-    
   }
 
   return (

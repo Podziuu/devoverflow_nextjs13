@@ -57,7 +57,7 @@ export async function getQuestions(params: GetQuestionsParams) {
       .limit(pageSize)
       .sort(sortOptions);
 
-      const isNext = totalQuestions > (page - 1) * pageSize + questions.length;
+    const isNext = totalQuestions > (page - 1) * pageSize + questions.length;
 
     return { questions, isNext };
   } catch (error) {
@@ -80,6 +80,7 @@ export async function createQuestion(params: CreateQuestionParams) {
     });
 
     const tagDocuments = [];
+    let newTags = 0;
 
     // create the tags or get them if they already exits
     for (const tag of tags) {
@@ -89,6 +90,10 @@ export async function createQuestion(params: CreateQuestionParams) {
         { upsert: true, new: true }
       );
 
+      if(new Date().getTime() - existingTag.createdOn.getTime() < 1000 * 60) {
+        newTags++;
+      }
+
       tagDocuments.push(existingTag._id);
     }
 
@@ -97,11 +102,19 @@ export async function createQuestion(params: CreateQuestionParams) {
     });
 
     // create an interaction record for the user's ask_question action
-
+    await Interaction.create({
+      user: author,
+      action: "ask_question",
+      question: question._id,
+      tags: tagDocuments,
+    });
     // increment author's reputation by +5 for creating a question
-
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 5 + newTags * 10 } });
     revalidatePath(path);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 }
 
 export async function getQuestionById(params: GetQuestionByIdParams) {
@@ -157,6 +170,15 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
     }
 
     // Increment author's reputtaion
+    if (question.author.toString() !== userId) {
+      await User.findByIdAndUpdate(userId, {
+        $inc: { reputation: hasupVoted ? -1 : 1 },
+      });
+
+      await User.findByIdAndUpdate(question.author, {
+        $inc: { reputation: hasupVoted ? -10 : 10 },
+      });
+    }
 
     revalidatePath(path);
   } catch (error) {
@@ -197,6 +219,15 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     }
 
     // Increment author's reputtaion
+    if (question.author.toString() !== userId) {
+      await User.findByIdAndUpdate(userId, {
+        $inc: { reputation: hasdownVoted ? -1 : 1 },
+      });
+
+      await User.findByIdAndUpdate(question.author, {
+        $inc: { reputation: hasdownVoted ? -10 : 10 },
+      });
+    }
 
     revalidatePath(path);
   } catch (error) {
