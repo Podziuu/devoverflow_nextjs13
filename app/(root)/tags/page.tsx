@@ -10,7 +10,7 @@ import React from "react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Edit Question | Dev Overflow",
+  title: "Tags | Dev Overflow",
 };
 
 const Page = async ({ searchParams }: SearchParamsProps) => {
