@@ -17,7 +17,6 @@ const EditDelete = ({ type, itemId }: Props) => {
   const router = useRouter();
   const handleEdit = () => {
     if (type === "question") {
-      toast({ title: "Edit question" });
       router.push(`/question/edit/${JSON.parse(itemId)}`);
     }
   };

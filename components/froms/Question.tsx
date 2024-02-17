@@ -22,6 +22,7 @@ import Image from "next/image";
 import { createQuestion, editQuestion } from "@/lib/actions/question.action";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/context/ThemeProvider";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Props {
   type?: string;
@@ -35,6 +36,7 @@ const Question = ({ type, mongoUserId, question }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { toast } = useToast();
 
   const parsedQuestion = question && JSON.parse(question);
 
@@ -60,8 +62,10 @@ const Question = ({ type, mongoUserId, question }: Props) => {
           title: values.title,
           content: values.explanation,
           path: pathname,
-        })
-
+        });
+        toast({
+          title: "Question edited successfully",
+        });
         router.push(`/question/${parsedQuestion?._id}`);
       } else {
         await createQuestion({
@@ -72,6 +76,9 @@ const Question = ({ type, mongoUserId, question }: Props) => {
           path: pathname,
         });
         // navigate to home page
+        toast({
+          title: "Question created successfully",
+        });
         router.push("/");
       }
     } catch (error) {
@@ -223,20 +230,22 @@ const Question = ({ type, mongoUserId, question }: Props) => {
                         <Badge
                           key={tag}
                           className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize"
-                          onClick={() => type !== "edit" ? handleTagRemove(tag, field) : () => {}}
+                          onClick={() =>
+                            type !== "edit"
+                              ? handleTagRemove(tag, field)
+                              : () => {}
+                          }
                         >
                           {tag}
-                          {
-                            (type !== "edit" && (
-                              <Image
-                                src="/assets/icons/close.svg"
-                                alt="close icon"
-                                width={12}
-                                height={12}
-                                className="cursor-pointer object-contain invert-0 dark:invert"
-                              />
-                            ))
-                          }
+                          {type !== "edit" && (
+                            <Image
+                              src="/assets/icons/close.svg"
+                              alt="close icon"
+                              width={12}
+                              height={12}
+                              className="cursor-pointer object-contain invert-0 dark:invert"
+                            />
+                          )}
                         </Badge>
                       ))}
                     </div>

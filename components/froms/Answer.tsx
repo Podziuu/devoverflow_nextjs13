@@ -18,6 +18,7 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 import { createAnswer } from "@/lib/actions/answer.action";
 import { usePathname } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Props {
   question: string;
@@ -31,6 +32,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
   const [isSubmittingAI, setIsSubmittingAI] = useState(false);
   const { mode } = useTheme();
   const editorRef = useRef(null);
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof AnswerSchema>>({
     resolver: zodResolver(AnswerSchema),
     defaultValues: {
@@ -86,6 +88,9 @@ const Answer = ({ question, questionId, authorId }: Props) => {
         editor.setContent(formattedAnswer);
       }
 
+      toast({
+        title: "AI Answer Generated",
+      })
       // alert(aiAnswer.reply);
     } catch (error) {
       console.log(error);
@@ -106,9 +111,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
           onClick={generateAIAnswer}
         >
           {isSubmittingAI ? (
-            <>
-              Generating...
-            </>
+            <>Generating...</>
           ) : (
             <>
               <Image

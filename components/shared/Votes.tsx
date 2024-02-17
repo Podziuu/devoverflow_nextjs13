@@ -11,6 +11,7 @@ import { formatNumberWithExtension } from "@/lib/utils";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Props {
   type: string;
@@ -35,6 +36,7 @@ const Votes = ({
 }: Props) => {
   const pathname = usePathname();
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSave = async () => {
     await toggleSaveQuestion({
@@ -42,10 +44,20 @@ const Votes = ({
       questionId: JSON.parse(itemId),
       path: pathname,
     });
+
+    return toast({
+      title: `Question ${!hasSaved ? "Saved in" : "Removed from your collection"}`,
+      variant: !hasSaved ? "default" : "destructive",
+    });
   };
 
   const handleVote = async (action: string) => {
-    if (!userId) return;
+    if (!userId) {
+      toast({
+        title: "Please log in",
+        description: "You must be logged in to perform this action.",
+      });
+    }
     if (action === "upvote") {
       if (type === "Question") {
         await upvoteQuestion({
@@ -64,8 +76,11 @@ const Votes = ({
           path: pathname,
         });
       }
-      // TODO: add a toast
-      return;
+
+      return toast({
+        title: `Upvote ${!hasupVoted ? "Successful" : "Removed"}`,
+        variant: !hasupVoted ? "default" : "destructive",
+      });
     }
 
     if (action === "downvote") {
@@ -86,6 +101,11 @@ const Votes = ({
           path: pathname,
         });
       }
+
+      return toast({
+        title: `Downvote ${!hasupVoted ? "Successful" : "Removed"}`,
+        variant: !hasupVoted ? "default" : "destructive",
+      });
     }
   };
 
@@ -94,7 +114,7 @@ const Votes = ({
       questionId: JSON.parse(itemId),
       userId: userId ? JSON.parse(userId) : undefined,
     });
-  }, [itemId, userId, pathname, router])
+  }, [itemId, userId, pathname, router]);
 
   return (
     <div className="flex gap-5">
