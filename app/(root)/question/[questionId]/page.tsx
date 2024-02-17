@@ -11,6 +11,14 @@ import { auth } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 
+export async function generateMetadata({params} : any) {
+  const question = await getQuestionById({ questionId: params.questionId });
+
+  return {
+    title: `${question.title} | Dev Overflow`,
+  };
+}
+
 interface Props {
   params: {
     questionId: string;

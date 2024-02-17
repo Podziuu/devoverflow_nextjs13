@@ -27,6 +27,34 @@ export const metadata: Metadata = {
   icons: {
     icon: "/assets/images/site-logo.svg",
   },
+  openGraph: {
+    title: "Home | Dev Overflow",
+    description:
+      "Dev Overflow is a community-driven platform for asking and answering programming questions. Get help, share knowledge, and collaborate with developers from around the world. Explore topics in web development, mobile app development, algorithms, data structures, and more.",
+    images: [
+      {
+        url: "/assets/images/site-logo.svg",
+        width: 800,
+        height: 600,
+        alt: "Dev Overflow",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Home | Dev Overflow",
+    description:
+      "Dev Overflow is a community-driven platform for asking and answering programming questions. Get help, share knowledge, and collaborate with developers from around the world. Explore topics in web development, mobile app development, algorithms, data structures, and more.",
+    creator: "@Podziuu",
+    images: [
+      {
+        url: "/assets/images/site-logo.svg",
+        width: 800,
+        height: 600,
+        alt: "Dev Overflow",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

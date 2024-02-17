@@ -147,3 +147,16 @@ export async function getTopPopularTags() {
     throw error;
   }
 }
+
+export async function getTagById(params: { tagId: string }) {
+  try {
+    connectToDatabase();
+
+    const tag = await Tag.findById(params.tagId);
+
+    return tag;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}

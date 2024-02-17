@@ -2,9 +2,17 @@ import QuestionCard from "@/components/cards/QuestionCard";
 import NoResult from "@/components/shared/NoResult";
 import Pagination from "@/components/shared/Pagination";
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
-import { getQuestionsByTagId } from "@/lib/actions/tag.action";
+import { getQuestionsByTagId, getTagById } from "@/lib/actions/tag.action";
 import { URLProps } from "@/types";
 import React from "react";
+
+export async function generateMetadata({params}: {params: {id: string}}) {
+  const result = await getTagById({tagId: params.id});
+
+  return {
+    title: `${result.name} | Dev Overflow`,
+  };
+}
 
 const Page = async ({ params, searchParams }: URLProps) => {
   const result = await getQuestionsByTagId({

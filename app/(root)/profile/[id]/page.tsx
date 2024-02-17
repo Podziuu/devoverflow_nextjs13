@@ -11,6 +11,14 @@ import Stats from "@/components/shared/Stats";
 import QuestionTab from "@/components/shared/QuestionTab";
 import AnswersTab from "@/components/shared/AnswersTab";
 
+export async function generateMetadata({params} : any) {
+  const userInfo = await getUserInfo({ userId: params.id });
+
+  return {
+    title: `${userInfo.user.username} | Dev Overflow`,
+  };
+}
+
 const Page = async ({ params, searchParams }: URLProps) => {
   const { userId: clerkId } = auth();
   const userInfo = await getUserInfo({ userId: params.id });
