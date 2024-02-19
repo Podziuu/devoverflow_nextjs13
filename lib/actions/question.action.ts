@@ -10,6 +10,7 @@ import {
   GetQuestionByIdParams,
   GetQuestionsParams,
   QuestionVoteParams,
+  RecommendedParams,
 } from "./shared.types";
 import User from "@/database/user.modal";
 import { revalidatePath } from "next/cache";
@@ -90,7 +91,7 @@ export async function createQuestion(params: CreateQuestionParams) {
         { upsert: true, new: true }
       );
 
-      if(new Date().getTime() - existingTag.createdOn.getTime() < 1000 * 60) {
+      if (new Date().getTime() - existingTag.createdOn.getTime() < 1000 * 60) {
         newTags++;
       }
 
@@ -109,7 +110,9 @@ export async function createQuestion(params: CreateQuestionParams) {
       tags: tagDocuments,
     });
     // increment author's reputation by +5 for creating a question
-    await User.findByIdAndUpdate(author, { $inc: { reputation: 5 + newTags * 10 } });
+    await User.findByIdAndUpdate(author, {
+      $inc: { reputation: 5 + newTags * 10 },
+    });
     revalidatePath(path);
   } catch (error) {
     console.log(error);
@@ -291,6 +294,63 @@ export async function getHotQuestions() {
       .limit(5);
 
     return questions;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function getRecommendedQuestions(params: RecommendedParams) {
+  try {
+    connectToDatabase();
+
+    const { userId, page = 1, pageSize = 20, searchQuery } = params;
+
+    const user = await User.findOne({ clerkId: userId });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const interactions = await Interaction.find({ user: user._id })
+      .populate("tags")
+      .exec();
+
+    const userTags = interactions.reduce((tags, interaction) => {
+      if (interaction.tags) {
+        tags.push(...interaction.tags);
+      }
+      return tags;
+    }, []);
+
+    const uniqueTags = [
+      // @ts-ignore
+      ...new Set(userTags.map((tag) => tag._id)),
+    ];
+
+    const query: FilterQuery<typeof Question> = {
+      $and: [{ tags: { $in: uniqueTags } }, { author: { $ne: user._id } }],
+    };
+
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: new RegExp(searchQuery, "i") } },
+        { content: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
+
+    const questions = await Question.find(query)
+      .populate({ path: "tags", model: Tag })
+      .populate({ path: "author", model: User })
+      .limit(pageSize)
+      .skip((page - 1) * pageSize)
+      .sort({ createdAt: -1 });
+
+    const totalQuestions = await Question.countDocuments(query);
+
+    const isNext = totalQuestions > (page - 1) * pageSize + questions.length;
+
+    return { questions, isNext };
   } catch (error) {
     console.log(error);
     throw error;

@@ -11,21 +11,21 @@ const HomeFilters = () => {
   const query = searchParams.get("filter");
 
   const clickHandler = (text: string) => {
-    if(text === query) {
+    if (text === query) {
       const newUrl = removeKeysFromQuery({
         params: searchParams.toString(),
-        keysToRemove: ['filter']
-      })
-      router.push(newUrl, {scroll: false})
+        keysToRemove: ["filter"],
+      });
+      router.push(newUrl, { scroll: false });
     } else {
       const newUrl = formUrlQuery({
         params: searchParams.toString(),
         key: "filter",
         value: text,
-      })
-      router.push(newUrl, {scroll: false});
+      });
+      router.push(newUrl, { scroll: false });
     }
-  }
+  };
 
   return (
     <div className="mt-10 hidden flex-wrap gap-3 md:flex">
@@ -35,8 +35,8 @@ const HomeFilters = () => {
           onClick={() => clickHandler(item.value)}
           className={`body-medium rounded-lg px-6 py-3 capitalize shadow-none ${
             query === item.value
-              ? "bg-primary-100 text-primary-500"
-              : "bg-light-800 text-light-500 dark:bg-dark-300 dark:text-light-500"
+              ? "bg-primary-100 text-primary-500 hover:bg-primary-100 dark:bg-dark-400 dark:text-primary-500 dark:hover:bg-dark-400"
+              : "bg-light-800 text-light-500 hover:bg-light-700 dark:bg-dark-300 dark:text-light-500 dark:hover:bg-dark-200"
           }`}
         >
           {item.name}
