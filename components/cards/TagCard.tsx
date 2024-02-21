@@ -17,9 +17,6 @@ const TagCard = ({ tag }: Props) => {
         <div className="background-light800_dark400 w-fit rounded-sm px-5 py-1.5">
           <p className="paragraph-semibold text-dark300_light900">{tag.name}</p>
         </div>
-        {/* <p className="small-regular text-dark500_light700 mt-5 max-w-[200px]">
-          {tag.description}
-        </p> */}
         <p className="small-medium text-dark400_light500 mt-3.5">
           <span className="primary-text-gradient body-semibold mr-2.5">
             {tag.questions.length}+
