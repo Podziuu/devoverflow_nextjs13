@@ -381,3 +381,18 @@ export async function getUserAnswers(params: GetUserStatsParams) {
     throw error;
   }
 }
+
+export async function getUserCountry() {
+  try {
+    const res = await fetch("http://ip-api.com/json/");
+
+    const data = await res.json();
+
+    const country = data.country;
+
+    return country;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}

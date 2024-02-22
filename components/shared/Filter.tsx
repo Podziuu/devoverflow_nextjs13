@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -19,25 +19,35 @@ interface Props {
   }[];
   otherClasses?: string;
   containerClasses?: string;
+  defaultFilter?: string;
 }
 
-const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
+const Filter = ({ filters, otherClasses, containerClasses, defaultFilter }: Props) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const filter = searchParams.get("filter");
-  const handleValueChange = (value: string) => {
+  const handleValueChange = useCallback((value: string) => {
     const newUrl = formUrlQuery({
       params: searchParams.toString(),
       key: "filter",
       value,
-    })
- 
+    });
+
     router.push(newUrl, { scroll: false });
-  }
+  }, [searchParams, router]);
+
+  useEffect(() => {
+    if (defaultFilter) {
+      handleValueChange(defaultFilter);
+    }
+  }, [defaultFilter, handleValueChange])
 
   return (
     <div className={`relative ${containerClasses}`}>
-      <Select defaultValue={filter || undefined} onValueChange={handleValueChange}>
+      <Select
+        defaultValue={filter || defaultFilter || undefined}
+        onValueChange={handleValueChange}
+      >
         <SelectTrigger
           className={`${otherClasses} body-regular light-border background-light800_dark300 text-dark500_light700 border px-5 py-2.5`}
         >
@@ -45,7 +55,7 @@ const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
             <SelectValue placeholder="Select a Filter" />
           </div>
         </SelectTrigger>
-        <SelectContent className="text-dark500_light700 small-regular border-none bg-light-900 dark:bg-dark-300">
+        <SelectContent className="text-dark500_light700 small-regular max-h-[280px] w-56 overflow-y-auto border-none bg-light-900 dark:bg-dark-300">
           <SelectGroup>
             {filters.map((filter) => (
               <SelectItem
