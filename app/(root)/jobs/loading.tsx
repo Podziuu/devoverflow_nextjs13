@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
 
 const Loading = () => {
   return (
@@ -14,13 +12,6 @@ const Loading = () => {
         <div className="hidden max-md:block">
           <Skeleton className="h-14 w-28" />
         </div>
-      </div>
-
-      <div className="my-10 hidden flex-wrap gap-6 md:flex">
-        <Skeleton className="h-6 w-40" />
-        <Skeleton className="h-6 w-40" />
-        <Skeleton className="h-6 w-40" />
-        <Skeleton className="h-6 w-40" />
       </div>
 
       <div className="flex flex-col gap-6">
